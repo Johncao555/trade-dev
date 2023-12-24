@@ -26,6 +26,7 @@
     <modules>
         <module>trade-goods</module>
         <module>trade-order</module>
+
     </modules>
 
     <dependencies>
