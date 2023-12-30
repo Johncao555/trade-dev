@@ -1,7 +1,9 @@
 package com.shangan.trade.goods;
 
 import com.alibaba.fastjson.JSON;
+import com.shangan.trade.goods.db.model.Goods;
 import com.shangan.trade.goods.model.Person;
+import com.shangan.trade.goods.service.SearchService;
 import org.apache.http.HttpHost;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
@@ -30,6 +32,10 @@ import java.util.List;
 public class ESTest {
     @Autowired
     private RestHighLevelClient client;
+
+    @Autowired
+    private SearchService searchService;
+
     /**
      * 添加文档
      * @throws Exception
@@ -215,5 +221,46 @@ public class ESTest {
                 new HttpHost("http://127.0.0.1/", 9200, "http")
         ));
         System.out.println(JSON.toJSONString(client));
+    }
+
+    /**
+     * 向ES中添加商品数据
+     */
+    @Test
+    public void addGoodsToES() {
+        Goods goods = new Goods();
+        goods.setTitle("三星 glaxy note2");
+        goods.setBrand("三星");
+        goods.setCategory("手机");
+        goods.setNumber("NO123458");
+        goods.setImage("test");
+        goods.setDescription("三星 SAMSUNG Galaxy S22 超视觉夜拍系统超清夜景 超电影影像系统 超耐用精工设计 8GB+128GB 曜夜黑 5G手机");
+        goods.setKeywords("三星 SAMSUNG Galaxy");
+        goods.setSaleNum(78);
+        goods.setAvailableStock(10000);
+        goods.setPrice(899999);
+        goods.setStatus(1);
+        goods.setId(25L);
+
+//        Goods goods = new Goods();
+//        goods.setTitle("华为mate50 pro");
+//        goods.setBrand("华为");
+//        goods.setCategory("手机");
+//        goods.setNumber("NO12360");
+//        goods.setImage("test");
+//        goods.setDescription("华为mate50 新品手机 曜金黑 8G+256G 全网通");
+//        goods.setKeywords("华为mate50 新品手机 曜金黑");
+//        goods.setSaleNum(58);
+//        goods.setAvailableStock(10000);
+//        goods.setPrice(899999);
+//        goods.setStatus(1);
+//        goods.setId(25L);
+
+        searchService.addGoodsToES(goods);
+    }
+    @Test
+    public void goodsSearch(){
+        List<Goods> goodsList = searchService.searchGoodsList("曜金黑", 0, 10);
+        System.out.println(JSON.toJSONString(goodsList));
     }
 }
