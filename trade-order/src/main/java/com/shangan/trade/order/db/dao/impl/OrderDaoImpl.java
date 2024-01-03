@@ -16,7 +16,7 @@ public class OrderDaoImpl implements OrderDao {
 
     @Override
     public boolean insertOrder(Order order) {
-        log.info("In OrderDaoImpl.insertOrder(): before");
+        //log.info("In OrderDaoImpl.insertOrder(): before");
         int result = orderMapper.insert(order);
         log.info("In OrderDaoImpl.insertOrder(): after");
         //大于0 表示插入成功

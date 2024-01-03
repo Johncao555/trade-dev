@@ -69,7 +69,7 @@ public class PortalController {
      */
     @RequestMapping("/buy/{userId}/{goodsId}")
     public String buy(Map<String, Object> resultMap, @PathVariable long userId, @PathVariable long goodsId) {
-        log.info("Start to order ...");
+        //log.info("Start to order ...");
         log.info("userId={}, goodsId={}", userId, goodsId);
         Order order = orderService.createOrder(userId, goodsId);
         resultMap.put("order", order);
