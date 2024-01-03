@@ -24,7 +24,7 @@ public class OrderTest {
     public void insertGoodsTest() {
         System.out.println("Hello");
         Order order = new Order();
-        order.setId(678L);
+        //order.setId(678L);
 
         order.setActivityId(0L);
         order.setActivityType(0);
