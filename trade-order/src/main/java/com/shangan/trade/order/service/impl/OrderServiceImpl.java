@@ -39,15 +39,15 @@ public class OrderServiceImpl implements OrderService {
         Order order = new Order();
         //普通商品购买默认无活动
         order.setId(snowFlake.nextId());
-        //order.setActivityId(0L);
-        //order.setActivityType(0);
-        //order.setGoodsId(goodsId);
+        order.setActivityId(0L);
+        order.setActivityType(0);
+        order.setGoodsId(goodsId);
         order.setUserId(userId);
         /*
          * 状态:0,没有可用库存订单创建失败;1,已创建，等待付款;2 已支付,等待发货;99 订单关闭，超时未付款
          */
-        // order.setStatus(1);
-        // order.setCreateTime(new Date());
+        order.setStatus(1);
+        order.setCreateTime(new Date());
         log.info("In createOrder, before queryGoodsById(), goodsId={},userId={}", goodsId, userId);
 
         Goods goods = goodsDao.queryGoodsById(goodsId);
@@ -57,7 +57,6 @@ public class OrderServiceImpl implements OrderService {
         }
 
         log.info("In createOrder, after queryGoodsById(), goodsId={},userId={}", goodsId, userId);
-
 
         order.setPayPrice(goods.getPrice());
 
