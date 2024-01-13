@@ -2,9 +2,10 @@ package com.shangan.trade.goods.db.dao;
 
 import com.shangan.trade.goods.db.mappers.GoodsMapper;
 import com.shangan.trade.goods.db.model.Goods;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+@Slf4j
 @Service
 public class GoodsDaoImpl implements GoodsDao {
 
@@ -37,5 +38,36 @@ public class GoodsDaoImpl implements GoodsDao {
     public boolean updateGoods(Goods goods) {
         int result = goodsMapper.updateByPrimaryKey(goods);
         return result > 0;
+    }
+
+    @Override
+    public boolean lockStock(long id) {
+        int result = goodsMapper.lockStock(id);
+        //大于0 表示插入成功
+        if (result < 0) {
+            log.error("锁定库存失败");
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public boolean deductStock(long id) {
+        int result = goodsMapper.deductStock(id);
+        if (result < 1) {
+            log.error("扣减库存失败");
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public boolean revertStock(long id) {
+        int result = goodsMapper.revertStock(id);
+        if (result < 1) {
+            log.error("库存回补失败");
+            return false;
+        }
+        return true;
     }
 }
