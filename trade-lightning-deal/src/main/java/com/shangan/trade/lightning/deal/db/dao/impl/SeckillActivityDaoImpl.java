@@ -3,11 +3,12 @@ package com.shangan.trade.lightning.deal.db.dao.impl;
 import com.shangan.trade.lightning.deal.db.dao.SeckillActivityDao;
 import com.shangan.trade.lightning.deal.db.mappers.SeckillActivityMapper;
 import com.shangan.trade.lightning.deal.db.model.SeckillActivity;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-
+@Slf4j
 @Service
 public class SeckillActivityDaoImpl implements SeckillActivityDao {
 
@@ -34,4 +35,10 @@ public class SeckillActivityDaoImpl implements SeckillActivityDao {
         return seckillActivityMapper.queryActivitysByStatus(status);
     }
 
+    @Override
+    public boolean updateAvailableStockByPrimaryKey(long id) {
+        log.info("+++Before updateAvailableStockByPrimaryKey(long id)");
+        int result = seckillActivityMapper.updateAvailableStockByPrimaryKey(id);
+        return result > 0;
+    }
 }

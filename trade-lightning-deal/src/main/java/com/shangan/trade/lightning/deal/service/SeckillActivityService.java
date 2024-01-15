@@ -24,4 +24,12 @@ public interface SeckillActivityService {
 
     List<SeckillActivity> queryActivitysByStatus(int status);
 
+    /**
+     * 处理秒杀请求
+     *
+     * @param seckillActivityId
+     * @return
+     */
+    boolean processSeckillReqBase(long seckillActivityId);
+
 }
