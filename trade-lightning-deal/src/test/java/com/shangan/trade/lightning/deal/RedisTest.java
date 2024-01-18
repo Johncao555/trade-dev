@@ -34,7 +34,7 @@ public class RedisTest {
 
     @Test
     public void stockCheckTest() {
-        //redisWorker.stockDeductCheck("stock:3");
+        redisWorker.stockDeductCheck("stock:3");
         System.out.println(redisWorker.getValueByKey("stock:3"));
     }
 

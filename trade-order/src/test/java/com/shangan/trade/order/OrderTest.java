@@ -2,6 +2,7 @@ package com.shangan.trade.order;
 
 import com.shangan.trade.order.db.dao.OrderDao;
 import com.shangan.trade.order.db.model.Order;
+import com.shangan.trade.order.service.LimitBuyService;
 import com.shangan.trade.order.service.OrderService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,6 +20,9 @@ public class OrderTest {
 
     @Autowired
     private OrderService orderService;
+
+    @Autowired
+    private LimitBuyService limitBuyService;
 
     @Test
     public void insertGoodsTest() {
@@ -42,7 +46,18 @@ public class OrderTest {
 
     @Test
     public void insertGoodsTest2() {
-        orderService.createOrder(123L,2L);
+        orderService.createOrder(123L,36L);
+    }
+
+    @Test
+    public void addRedisLimitTest() {
+        limitBuyService.addLimitMember(3L, 123);
+    }
+
+    @Test
+    public void inRedisLimitTest() {
+        limitBuyService.removeLimitMember(3L, 123);
+        limitBuyService.isInLimitMember(3L, 123);
     }
 
 }

@@ -41,6 +41,7 @@ public class OrderServiceImpl implements OrderService {
     private SnowflakeIdWorker snowFlake = new SnowflakeIdWorker(6, 8);
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Order createOrder(long userId, long goodsId) {
         Order order = new Order();
         //普通商品购买默认无活动
@@ -105,11 +106,11 @@ public class OrderServiceImpl implements OrderService {
          */
         if (order == null) {
             log.error("orderId={} 对应订单不存在", orderId);
-            return;
+            throw new RuntimeException("对应订单不存在");
         }
         if (order.getStatus() != 1) {
-            log.error("orderId={}  订单状态无法支付：", orderId);
-            return;
+            log.error("orderId={} 订单状态无法支付", orderId);
+            throw new RuntimeException("订单状态无法支付");
         }
         //Mock 模拟调用支付平台
         log.info("调用第三方支付平台付款.......");
@@ -121,17 +122,19 @@ public class OrderServiceImpl implements OrderService {
          * 2:支付完成
          */
         order.setStatus(2);
-        boolean updateResult = orderDao.updateOrder(order);
-        if (!updateResult) {
+        boolean updateRessult = orderDao.updateOrder(order);
+        if (!updateRessult) {
             log.error("orderId={} 订单支付状态更新失败", orderId);
             throw new RuntimeException("订单支付状态更新失败");
         }
 
         //库存扣减
-        boolean deductResult = goodsService.deductStock(order.getGoodsId());
-        if (!deductResult) {
-            log.error("orderId={} 库存扣减失败", orderId);
-            throw new RuntimeException("库存扣减失败");
+        if (order.getActivityType() == 0) {
+            //普通商品处理
+            goodsService.deductStock(order.getGoodsId());
+        } else if (order.getActivityType() == 1) {
+            //秒杀活动处理,发送支付成功消息
+            orderMessageSender.sendSeckillPaySucessMessage(JSON.toJSONString(order));
         }
     }
 }
