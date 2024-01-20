@@ -4,6 +4,7 @@ import com.shangan.trade.order.db.dao.OrderDao;
 import com.shangan.trade.order.db.model.Order;
 import com.shangan.trade.order.service.LimitBuyService;
 import com.shangan.trade.order.service.OrderService;
+import com.shangan.trade.order.service.RiskBlackListService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,9 @@ public class OrderTest {
 
     @Autowired
     private LimitBuyService limitBuyService;
+
+    @Autowired
+    private RiskBlackListService riskBlackListService;
 
     @Test
     public void insertGoodsTest() {
@@ -58,6 +62,12 @@ public class OrderTest {
     public void inRedisLimitTest() {
         limitBuyService.removeLimitMember(3L, 123);
         limitBuyService.isInLimitMember(3L, 123);
+    }
+
+    @Test
+    public void addRiskBlackListTest() {
+       // riskBlackListService.addRiskBlackListMember(123456);
+        riskBlackListService.removeRiskBlackListMember(123456);
     }
 
 }

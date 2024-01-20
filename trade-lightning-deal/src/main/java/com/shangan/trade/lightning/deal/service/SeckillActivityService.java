@@ -65,4 +65,6 @@ public interface SeckillActivityService {
      * @return
      */
     boolean revertStock(long id);
+
+    void pushSeckillActivityInfoToCache(long id);
 }
