@@ -1,15 +1,12 @@
 package com.shangan.trade.web.manager.controller;
 
-
-import com.alibaba.fastjson.JSON;
 import com.shangan.trade.goods.db.model.Goods;
 import com.shangan.trade.goods.service.GoodsService;
-import com.shangan.trade.lightning.deal.db.model.SeckillActivity;
-import com.shangan.trade.lightning.deal.service.SeckillActivityService;
+import com.shangan.trade.web.manager.client.SeckillActivityFeignClient;
+import com.shangan.trade.web.manager.client.model.SeckillActivity;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -25,7 +22,7 @@ public class ManagerController {
     private GoodsService goodsService;
 
     @Autowired
-    private SeckillActivityService seckillActivityService;
+    private SeckillActivityFeignClient seckillActivityFeignClient;
 
     /**
      * 跳转到主页面
@@ -145,7 +142,7 @@ public class ManagerController {
             seckillActivity.setSeckillPrice(seckillPrice);
             seckillActivity.setOldPrice(oldPrice);
             seckillActivity.setCreateTime(new Date());
-            seckillActivityService.insertSeckillActivity(seckillActivity);
+            seckillActivityFeignClient.insertSeckillActivity(seckillActivity);
             resultMap.put("seckillActivity", seckillActivity);
             return "add_skill_activity";
         } catch (Exception e) {
@@ -153,6 +150,7 @@ public class ManagerController {
             return "500";
         }
     }
+
 
     /**
      * 跳转到推送缓存预热页面
@@ -172,7 +170,8 @@ public class ManagerController {
     @RequestMapping("/pushSeckillCacheAction")
     public String pushSkilCache(@RequestParam("seckillId") long seckillId) {
         //将秒杀库存写入缓存中
-        seckillActivityService.pushSeckillActivityInfoToCache(seckillId);
+        seckillActivityFeignClient.pushSeckillActivityInfoToCache(seckillId);
         return "push_seckill_cache";
     }
+
 }

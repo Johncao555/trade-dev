@@ -1,4 +1,4 @@
-package com.shangan.trade.order.config;
+package com.shangan.trade.common.config;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

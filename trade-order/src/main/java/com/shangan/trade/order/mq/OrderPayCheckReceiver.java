@@ -1,7 +1,7 @@
 package com.shangan.trade.order.mq;
 
 import com.alibaba.fastjson.JSON;
-import com.shangan.trade.goods.service.GoodsService;
+import com.shangan.trade.order.client.GoodsFeignClient;
 import com.shangan.trade.order.db.dao.OrderDao;
 import com.shangan.trade.order.db.model.Order;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +18,7 @@ public class OrderPayCheckReceiver {
     private OrderDao orderDao;
 
     @Autowired
-    private GoodsService goodsService;
+    private GoodsFeignClient goodsService;
 
     /**
      * 消息处理

@@ -2,7 +2,6 @@ package com.shangan.trade.order;
 
 import com.shangan.trade.order.db.dao.OrderDao;
 import com.shangan.trade.order.db.model.Order;
-import com.shangan.trade.order.service.LimitBuyService;
 import com.shangan.trade.order.service.OrderService;
 import com.shangan.trade.order.service.RiskBlackListService;
 import org.junit.Test;

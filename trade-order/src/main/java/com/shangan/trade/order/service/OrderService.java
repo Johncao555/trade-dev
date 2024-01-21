@@ -27,4 +27,6 @@ public interface OrderService {
      * @param orderId
      */
     void payOrder(long orderId);
+
+    boolean updateOrder(Order order);
 }

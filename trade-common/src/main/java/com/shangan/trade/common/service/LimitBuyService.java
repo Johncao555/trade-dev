@@ -1,4 +1,4 @@
-package com.shangan.trade.order.service;
+package com.shangan.trade.common.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

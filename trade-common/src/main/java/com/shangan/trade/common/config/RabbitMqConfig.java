@@ -1,4 +1,4 @@
-package com.shangan.trade.order.mq;
+package com.shangan.trade.common.config;
 
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.Exchange;

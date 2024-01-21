@@ -1,8 +1,7 @@
 package com.shangan.trade.lightning.deal.service;
 
+import com.shangan.trade.lightning.deal.client.model.Order;
 import com.shangan.trade.lightning.deal.db.model.SeckillActivity;
-import com.shangan.trade.order.db.model.Order;
-import com.shangan.trade.order.service.OrderService;
 
 import java.util.List;
 
@@ -32,7 +31,7 @@ public interface SeckillActivityService {
      * @param seckillActivityId
      * @return
      */
-    Order processSeckillReqBase(long seckillActivityId, long userId);
+    boolean processSeckillReqBase(long seckillActivityId);
 
     /**
      * 处理秒杀请求
@@ -41,7 +40,6 @@ public interface SeckillActivityService {
      * @return
      */
     Order processSeckill(long userId, long seckillActivityId);
-
 
     /**
      * 锁定商品的库存
@@ -66,5 +64,10 @@ public interface SeckillActivityService {
      */
     boolean revertStock(long id);
 
-    void pushSeckillActivityInfoToCache(long id);
+    /**
+     * 缓存预热
+     *  将秒杀信息写入Redis中
+     * @param id
+     */
+    void  pushSeckillActivityInfoToCache(long id);
 }

@@ -1,15 +1,14 @@
 package com.shangan.trade.order.service.impl;
 
 import com.alibaba.fastjson.JSON;
-import com.shangan.trade.goods.db.dao.GoodsDao;
-import com.shangan.trade.goods.db.model.Goods;
-import com.shangan.trade.goods.service.GoodsService;
+import com.shangan.trade.common.utils.SnowflakeIdWorker;
+import com.shangan.trade.order.client.GoodsFeignClient;
+import com.shangan.trade.order.client.model.Goods;
 import com.shangan.trade.order.db.dao.OrderDao;
 import com.shangan.trade.order.db.model.Order;
 import com.shangan.trade.order.mq.OrderMessageSender;
 import com.shangan.trade.order.service.OrderService;
 import com.shangan.trade.order.service.RiskBlackListService;
-import com.shangan.trade.order.utils.SnowflakeIdWorker;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,10 +24,7 @@ public class OrderServiceImpl implements OrderService {
     private OrderDao orderDao;
 
     @Autowired
-    private GoodsDao goodsDao;
-
-    @Autowired
-    private GoodsService goodsService;
+    private GoodsFeignClient goodsFeignClient;
 
     @Autowired
     private OrderMessageSender orderMessageSender;
@@ -44,8 +40,17 @@ public class OrderServiceImpl implements OrderService {
      */
     private SnowflakeIdWorker snowFlake = new SnowflakeIdWorker(6, 8);
 
-    @Override
+
+    /**
+     * 创建订单和库存锁定在一个事务中，要么同时成功，要么同时失败
+     * 使用 @Transactional(rollbackFor = Exception.class)
+     *
+     * @param userId
+     * @param goodsId
+     * @return
+     */
     @Transactional(rollbackFor = Exception.class)
+    @Override
     public Order createOrder(long userId, long goodsId) {
         //判断用户是否在黑名单中
         boolean inRiskBlackListMember = riskBlackListService.isInRiskBlackListMember(userId);
@@ -53,7 +58,6 @@ public class OrderServiceImpl implements OrderService {
             log.error("user is in risk black list can not buy userId={}", userId);
             throw new RuntimeException("用户在黑名单中");
         }
-
         Order order = new Order();
         //普通商品购买默认无活动
         order.setId(snowFlake.nextId());
@@ -68,7 +72,7 @@ public class OrderServiceImpl implements OrderService {
         order.setCreateTime(new Date());
 
         //1.商品查询
-        Goods goods = goodsService.queryGoodsById(goodsId);
+        Goods goods = goodsFeignClient.queryGoodsById(goodsId);
         if (goods == null) {
             log.error("goods is null goodsId={},userId={}", goodsId, userId);
             throw new RuntimeException("商品不存在");
@@ -80,23 +84,15 @@ public class OrderServiceImpl implements OrderService {
         }
 
         //3.锁定库存
-        boolean lockResult = goodsService.lockStock(goodsId);
+        boolean lockResult = goodsFeignClient.lockStock(goodsId);
         if (!lockResult) {
             log.error("order lock stock error order={}", JSON.toJSONString(order));
             throw new RuntimeException("订单锁定库存失败");
         }
-
-        //4.创建订单
         order.setPayPrice(goods.getPrice());
-        boolean insertResult = orderDao.insertOrder(order);
-        if (!insertResult) {
-            log.error("order insert error order={}", JSON.toJSONString(order));
-            throw new RuntimeException("订单生成失败");
-        }
 
-        // Send order delay message
-        orderMessageSender.sendPayStatusCheckDelayMessage(JSON.toJSONString(order));
-
+        //4.创建订单，发送创建订单消息
+        orderMessageSender.sendCreateOrderMessage(JSON.toJSONString(order));
         return order;
     }
 
@@ -142,10 +138,15 @@ public class OrderServiceImpl implements OrderService {
         //库存扣减
         if (order.getActivityType() == 0) {
             //普通商品处理
-            goodsService.deductStock(order.getGoodsId());
+            goodsFeignClient.deductStock(order.getGoodsId());
         } else if (order.getActivityType() == 1) {
             //秒杀活动处理,发送支付成功消息
             orderMessageSender.sendSeckillPaySucessMessage(JSON.toJSONString(order));
         }
+    }
+
+    @Override
+    public boolean updateOrder(Order order) {
+        return orderDao.updateOrder(order);
     }
 }
