@@ -1,9 +1,9 @@
 package com.shangan.trade.order;
 
+import com.shangan.trade.common.utils.SnowflakeIdWorker;
 import com.shangan.trade.order.db.dao.OrderDao;
 import com.shangan.trade.order.db.model.Order;
 import com.shangan.trade.order.service.OrderService;
-import com.shangan.trade.order.service.RiskBlackListService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,9 +11,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Date;
+import java.util.Random;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest
+@SpringBootTest()
 public class OrderTest {
     @Autowired
     private OrderDao orderDao;
@@ -21,53 +22,49 @@ public class OrderTest {
     @Autowired
     private OrderService orderService;
 
-    @Autowired
-    private LimitBuyService limitBuyService;
-
-    @Autowired
-    private RiskBlackListService riskBlackListService;
+    private SnowflakeIdWorker snowFlake = new SnowflakeIdWorker(6, 8);
 
     @Test
     public void insertGoodsTest() {
-        System.out.println("Hello");
-        Order order = new Order();
-        //order.setId(678L);
+        for (int i = 0; i < 48; i++) {
+            System.out.println("Hello from OrderTest");
+            Order order = new Order();
 
-        order.setActivityId(0L);
-        order.setActivityType(0);
+            long userId = new Random().nextLong();
+            if (userId < 0) {
+                userId = -userId;
+            }
+            order.setUserId(userId);
+            System.out.println(userId);
 
-        order.setUserId(123456L);
-        order.setGoodsId(452L);
+            long orderId = snowFlake.nextId() + i + 1;
+            order.setId(orderId);
+            System.out.println(orderId);
 
-        order.setStatus(1);
+            order.setGoodsId(12378L);
+            order.setPayTime(new Date());
+            order.setPayPrice(1999);
+            order.setStatus(1);
+            order.setActivityType(1);
+            order.setCreateTime(new Date());
+            boolean insertresult = orderDao.insertOrder(order);
+            System.out.println(insertresult);
+        }
 
-        order.setPayTime(new Date());
-        order.setPayPrice(3599);
-        boolean insertresult = orderDao.insertOrder(order);
-        System.out.println(insertresult);
     }
-
-    @Test
-    public void insertGoodsTest2() {
-        orderService.createOrder(123L,36L);
-    }
-
-    @Test
-    public void addRedisLimitTest() {
-        limitBuyService.addLimitMember(3L, 123);
-    }
-
-    @Test
-    public void inRedisLimitTest() {
-        limitBuyService.removeLimitMember(3L, 123);
-        limitBuyService.isInLimitMember(3L, 123);
-    }
-
-    @Test
-    public void addRiskBlackListTest() {
-       // riskBlackListService.addRiskBlackListMember(123456);
-        riskBlackListService.removeRiskBlackListMember(123456);
-    }
+//
+//    @Test
+//    public void insertGoodsTest2() {
+//        orderService.createOrder(123L, 2L);
+//    }
+//
+//
+//    @Test
+//    public void updateTest2() {
+//        Order order = orderService.queryOrder(121675526674866176L);
+//        order.setStatus(98);
+//        orderService.updateOrder(order);
+//    }
 
 }
 
