@@ -1,6 +1,8 @@
 package com.shangan.trade.web.portal.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixProperty;
 import com.shangan.trade.common.model.TradeResultDTO;
 import com.shangan.trade.common.utils.RedisWorker;
 import com.shangan.trade.web.portal.client.GoodsFeignClient;
@@ -229,6 +231,11 @@ public class PortalController {
 //        }
 //    }
 
+
+    @HystrixCommand(fallbackMethod = "fallback",commandProperties = {
+            @HystrixProperty(name = "execution.isolation.strategy",value = "SEMAPHORE"),  //开启信号量隔离策略
+            @HystrixProperty(name = "execution.isolation.semaphore.maxConcurrentRequests", value = "1")//设置信号量隔离允许的最大并发数，默认为10
+    })
     @RequestMapping("/seckill/buy/{userId}/{seckillId}")
     public ModelAndView seckill(@PathVariable long userId, @PathVariable long seckillId) {
         ModelAndView modelAndView = new ModelAndView();
@@ -246,6 +253,20 @@ public class PortalController {
             modelAndView.addObject("errorInfo", e.getMessage());
             modelAndView.setViewName("error");
         }
+        return modelAndView;
+    }
+
+    /**
+     * 被限流时执行的fallback
+     * @param userId
+     * @param seckillId
+     * @return
+     */
+    public ModelAndView fallback(long userId, long seckillId) {
+        log.info("触发限流 fallback");
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.addObject("errorInfo", "请稍后再试,触发限流");
+        modelAndView.setViewName("error");
         return modelAndView;
     }
 }

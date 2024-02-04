@@ -102,18 +102,18 @@ public class SeckillActivityServiceImpl implements SeckillActivityService {
     public Order processSeckill(long userId, long seckillActivityId) {
 
         //1.校验用户是否有购买资格
-        if (limitBuyService.isInLimitMember(seckillActivityId, userId)) {
-            log.error("当前用户已经购买过不能重复购买 seckillActivityId={} userId={}", seckillActivityId, userId);
-            throw new RuntimeException("当前用户已经购买过,不能重复购买");
-        }
+//        if (limitBuyService.isInLimitMember(seckillActivityId, userId)) {
+//            log.error("当前用户已经购买过不能重复购买 seckillActivityId={} userId={}", seckillActivityId, userId);
+//            throw new RuntimeException("当前用户已经购买过,不能重复购买");
+//        }
 
         //2.使用Redis中Lua先进行库存校验
-        String key = "stock:" + seckillActivityId;
-        boolean checkReslut = redisWorker.stockDeductCheck(key);
-        if (!checkReslut) {
-            log.error("库存不足 seckillActivityId={} userId={}", seckillActivityId, userId);
-            throw new RuntimeException("库存不足，抢购失败");
-        }
+//        String key = "stock:" + seckillActivityId;
+//        boolean checkReslut = redisWorker.stockDeductCheck(key);
+//        if (!checkReslut) {
+//            log.error("库存不足 seckillActivityId={} userId={}", seckillActivityId, userId);
+//            throw new RuntimeException("库存不足，抢购失败");
+//        }
 
         //3.查询对应的秒杀活动信息
         SeckillActivity seckillActivity = seckillActivityDao.querySeckillActivityById(seckillActivityId);
